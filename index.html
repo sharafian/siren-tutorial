@@ -48,9 +48,13 @@ receive live XRP.</p>
 
 <h3>Create an XRP Wallet</h3>
 
-<p>You can use the <a href="https://toastwallet.com/">Toast Wallet</a> to create an XRP
-address. Follow their instructions until you've created a wallet. Make sure you
-back up your secret!</p>
+<p><strong>If you have an exchange account:</strong> Find your XRP deposit address. There will
+be an address that looks like <code>rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code> and a
+<strong>destination tag</strong> number that looks like <code>123456</code>, for instance.</p>
+
+<p><strong>If you don't have an exchange account:</strong> You can use the <a href="https://toastwallet.com/">Toast
+Wallet</a> to create an XRP address. Follow their
+instructions until you've created a wallet. Make sure you back up your secret!</p>
 
 <p>When you've created your wallet, you'll have an address that looks something
 like <code>rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code>. This is your <strong>XRP Address</strong>.</p>
@@ -63,21 +67,32 @@ The identifier that you use to receive money with Interledger is called a
 path. Your payment pointer will be based on Siren's domain, so you don't need
 to run anything yourself.</p>
 
-<p>Your payment pointer is: <code>$spsp.siren.sh/YOUR_XRP_ADDRESS</code>.</p>
+<p><strong>If you have an exchange account</strong> then your payment pointer is
+<code>$spsp.siren.sh/YOUR_XRP_DEPOSIT_ADDRESS/YOUR_DESTINATION_TAG</code></p>
+
+<p>So if your XRP deposit address were <code>rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code>, and
+your destination tag were <code>123456</code>, your payment pointer would be:</p>
+
+<p><code>$spsp.siren.sh/rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx/123456</code>.</p>
+
+<p><strong>If you don't have an exchange account:</strong> Your payment pointer is:
+<code>$spsp.siren.sh/YOUR_XRP_ADDRESS</code>.</p>
 
 <p>So if your XRP address were <code>rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code>, your payment
-pointer would be <code>$spsp.siren.sh/rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code>.</p>
+pointer would be:</p>
+
+<p><code>$spsp.siren.sh/rsKguPpyAZhpHqGyP8A3xu7Acsk3PF8zyx</code>.</p>
 
 <h3>Add the Web Monetization Script to Your Website</h3>
 
 <p>Add the following tag to your site's body. Make sure to replace
-<code>YOUR_XRP_ADDRESS</code> with your XRP address.</p>
+<code>YOUR_PAYMENT_POINTER</code> with your payment pointer.</p>
 
 <pre>
 &lt;script>
   if (window.monetize) {
     monetize({
-      receiver: '$spsp.siren.sh/YOUR_XRP_ADDRESS'
+      receiver: 'YOUR_PAYMENT_POINTER'
     })
       .then(() => {
         // You can insert code here to thank the user

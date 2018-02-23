@@ -40,8 +40,8 @@ Add the following tag to your site's body. Make sure to replace
 
 ```
 <script>
-  if (window.Monetization) {
-    Monetization.setReceiver({
+  if (window.monetize) {
+    monetize({
       receiver: `$spsp.siren.sh/YOUR_XRP_ADDRESS`
     })
       .then(() => {

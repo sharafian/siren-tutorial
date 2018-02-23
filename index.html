@@ -1,1 +1,149 @@
-<h1>Siren Tutorial</h1>
+<html>
+<head>
+  <title>Siren</title>
+  <link rel="stylesheet" href="/node_modules/highlight.js/styles/github.css">
+  <link
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+  <link
+    href="https://fonts.googleapis.com/css?family=Comfortaa|Open+Sans" rel="stylesheet">
+</head>
+<body>
+<div id="content">
+
+<h1>Making a Receiver for Siren</h1>
+
+<p>Siren aims to be a flexible and minimal platform for receiving ILP payments.
+So minimal, in fact, that the way in which you accept payments is completely up
+to you. All Siren provides is a ledger-level API.</p>
+
+<p>In order to receive a payment, you need to use a higher level protocol. This
+can be easily provided by hosting an ILP enabled API, using <code>koa</code> and
+<code>koa-ilp</code>. Funds from any user on the ILP network will then be aggregated
+and settled to you through Siren.</p>
+
+<h2>Writing an ILP enabled API</h2>
+
+<h3>Dependencies</h3>
+
+<p>Prepare your directory with:</p>
+
+<p><code>sh
+npm init
+npm install --save koa koa-router koa-ilp ilp-plugin \
+  ilp-plugin-payment-channel-framework
+</code></p>
+
+<p>Then open <code>index.js</code> in your editor of choice.</p>
+
+<h3>Code</h3>
+
+<p>We're going to use <code>koa-ilp</code> to make a paid API. Because it's based on koa,
+we start by making a Koa app:</p>
+
+<p><code>js
+const Koa = require('koa')
+const app = new Koa()
+</code></p>
+
+<p>Next, we add some routes and tell our app to listen.</p>
+
+<p>```js
+const router = require('router')()</p>
+
+<p>router.get('/', async ctx => {
+  ctx.body = "Hello World!"
+})</p>
+
+<p>app
+  .use(router.routes())
+  .use(router.allowedMethods())
+  .listen(8080)
+```</p>
+
+<p>Of course, it would be foolish to give away such a greeting for free. This is
+where ILP comes in; we're going to import <code>koa-ilp</code> and use it to charge for
+this endpoint.</p>
+
+<p>```js
+const plugin = require('ilp-plugin')()
+const ilp = require('koa-ilp')({ plugin })</p>
+
+<p>router.get('/', ilp.paid({ price: 1000000 }), async ctx => {
+  ctx.body = "Hello World!"
+})
+```</p>
+
+<p>Just three lines to fully integrate payments into your application; not bad. To
+make sure you fully understand how it works, I'll break down the three terms we
+added.</p>
+
+<ul>
+<li><p><code>require('ilp-plugin')()</code> - This uses details from the envionment (we'll get
+to them in a second) to create a connection to your ILP provider. The object
+which abstracts this connection is known as a plugin. In this tutorial, you'll
+connect a plugin to Siren.</p></li>
+<li><p><code>require('koa-ilp')({ plugin })</code> - In order to charge users money, <code>koa-ilp</code>
+needs to know when it's being payed. Because ILP is provider agnostic,
+<code>koa-ilp</code> uses the plugin abstraction to listen for incoming payment events.</p></li>
+<li><p><code>ilp.paid({ price: 1000000 })</code> - Finally, we put this middleware into any
+endpoint that we want to charge for. You might wonder what these units are;
+because we're connected to Siren, we'll use Sirens units. Siren measures
+amounts in nano-XRP. We're charging one million nano-XRP, i.e. one milli-XRP.
+ILP supports tiny amounts so you can make very precise micropayments.</p></li>
+</ul>
+
+<p>And that's it! You now have a fully ILP enabled appliction. The full code is
+provided below for you to copy, although it's only about 10 lines:</p>
+
+<p>```js
+const Koa = require('koa')
+const app = new Koa()
+const router = require('router')()
+const plugin = require('ilp-plugin')()
+const ilp = require('koa-ilp')({ plugin })</p>
+
+<p>router.get('/', ilp.paid({ price: 1000000 }), async ctx => {
+  ctx.body = "Hello World!"
+})</p>
+
+<p>app
+  .use(router.routes())
+  .use(router.allowedMethods())
+  .listen(8080)
+```</p>
+
+<h2>Get your Siren credentials</h2>
+
+<p>Now that you have the code for your paid application, you'll want to run it.
+In order to tell it how to connect to ILP, we need to give it some credentials
+through the environment:</p>
+
+<p><code>sh
+export ILP_PLUGIN='ilp-plugin-payment-channel-framework'
+export ILP_CREDENTIALS='{"server":"&lt;BTP_SECRET&gt;"}'
+</code></p>
+
+<ul>
+<li><p><code>ILP_PLUGIN</code> tells us the protocol that the ledger speaks. We're using a
+protocol called BTP, which is designed for payment-channel like systems.  The
+plugin's name is <code>ilp-plugin-payment-channel-framework</code>.</p></li>
+<li><p><code>ILP_CREDENTIALS</code> is a json object with the connection details to our ledger.
+Instead of putting <code>&lt;BTP_SECRET&gt;</code>, enter the <code>BTP Secret</code> field from your
+dashboard. The format will look familiar if you've used database connection
+strings.</p></li>
+</ul>
+
+<p>Alright, now that you've exported those credentials to the envionment, you
+can run:</p>
+
+<p><code>sh
+node index.js
+</code></p>
+
+<h2>Testing your paid API</h2>
+
+<p><em>TODO</em></p>
+</div>
+</body>
+</html>
